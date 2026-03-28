@@ -365,7 +365,9 @@ cit_grid_result %>%
 
 ```{r}
 # Based on lowest RMSE
-best_rmse <- cit_grid_result 
+best_rmse <- cit_grid_result %>% 
+  select_by_one_std_err("tree_depth",
+                        metric = "rmse")
 
 best_rmse
 
@@ -373,18 +375,20 @@ best_rmse
 
 ```{r}
 # Based on greatest R2
-best_r2 <- cit_grid_result 
+best_r2 <- cit_grid_result %>% 
+  select_by_one_std_err("tree_depth",
+                        metric = "rsq")
 
 best_r2
 
 ```
 Based on RMSE, we would choose   
-  - tree_depth = 10   
-  - conditional_min_criterion = 0.9926512
+  - tree_depth = 9  
+  - conditional_min_criterion = 0.999954
 
 Based on R2, we would choose   
-  - tree_depth = 10
-  - conditional_min_criterion = 0.9926512
+  - tree_depth = 9
+  - conditional_min_criterion =0.999954
 
 Let's use the hyperparameter values that optimized R2 to fit our final model.
 
@@ -463,7 +467,8 @@ final_fit %>%
   scale_x_continuous(limits = c(20, 40)) +
   scale_y_continuous(limits = c(20, 40)) 
 ```
-Why the 4 horizontal lines?  
+Why the 3 horizontal lines?  
+Because of the inference we got from the tree - check tree!!
 
 How can we get more horizontal lines in this type of algorithm?  
 
@@ -487,7 +492,11 @@ final_spec %>%
 Tree:  
 
 ```{r}
-
+final_spec %>% 
+  fit(strength_gtex ~.,
+      data = bake(weather_prep, weather)) %>% 
+  .$fit %>% 
+  plot()
   
 ```
 
